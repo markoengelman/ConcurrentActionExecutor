@@ -8,5 +8,9 @@
 import Foundation
 
 final class ConcurrentActionExecutor {
+  let queue: DispatchQueue
   
+  init(outputQueue: DispatchQueue) {
+    self.queue = outputQueue
+  }
 }
