@@ -33,12 +33,20 @@ class ConcurrentActionExecutorTests: XCTestCase {
     }
     wait(for: [exp], timeout: 0.1)
   }
+  
+  func test_execute_invokes_action() {
+    let exp = expectation(description: "Waiting for action to be executed")
+    let action = { exp.fulfill() }
+    let sut = makeSUT(action: action)
+    sut.execute { }
+    wait(for: [exp], timeout: 0.1)
+  }
 }
 
 // MARK: - Private
 private extension ConcurrentActionExecutorTests {
-  func makeSUT(queue: DispatchQueue = .main) -> ConcurrentActionExecutor {
-    let sut = ConcurrentActionExecutor(outputQueue: queue)
+  func makeSUT(queue: DispatchQueue = .main, action: @escaping ConcurrentActionExecutor.Action = { }) -> ConcurrentActionExecutor {
+    let sut = ConcurrentActionExecutor(outputQueue: queue, action: action)
     return sut
   }
 }
