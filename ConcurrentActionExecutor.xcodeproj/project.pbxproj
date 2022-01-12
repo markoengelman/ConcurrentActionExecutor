@@ -9,7 +9,7 @@
 /* Begin PBXBuildFile section */
 		533CC391278F7B1F006CADC2 /* ConcurrentActionExecutor.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 533CC388278F7B1F006CADC2 /* ConcurrentActionExecutor.framework */; };
 		533CC396278F7B1F006CADC2 /* ConcurrentActionExecutorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 533CC395278F7B1F006CADC2 /* ConcurrentActionExecutorTests.swift */; };
-		533CC397278F7B1F006CADC2 /* ConcurrentActionExecutor.h in Headers */ = {isa = PBXBuildFile; fileRef = 533CC38B278F7B1F006CADC2 /* ConcurrentActionExecutor.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		533CC3A1278F7BDB006CADC2 /* ConcurrentActionExecutor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 533CC3A0278F7BDB006CADC2 /* ConcurrentActionExecutor.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -24,9 +24,9 @@
 
 /* Begin PBXFileReference section */
 		533CC388278F7B1F006CADC2 /* ConcurrentActionExecutor.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ConcurrentActionExecutor.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		533CC38B278F7B1F006CADC2 /* ConcurrentActionExecutor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ConcurrentActionExecutor.h; sourceTree = "<group>"; };
 		533CC390278F7B1F006CADC2 /* ConcurrentActionExecutorTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ConcurrentActionExecutorTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		533CC395278F7B1F006CADC2 /* ConcurrentActionExecutorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConcurrentActionExecutorTests.swift; sourceTree = "<group>"; };
+		533CC3A0278F7BDB006CADC2 /* ConcurrentActionExecutor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConcurrentActionExecutor.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -72,7 +72,7 @@
 		533CC38A278F7B1F006CADC2 /* ConcurrentActionExecutor */ = {
 			isa = PBXGroup;
 			children = (
-				533CC38B278F7B1F006CADC2 /* ConcurrentActionExecutor.h */,
+				533CC3A0278F7BDB006CADC2 /* ConcurrentActionExecutor.swift */,
 			);
 			path = ConcurrentActionExecutor;
 			sourceTree = "<group>";
@@ -92,7 +92,6 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				533CC397278F7B1F006CADC2 /* ConcurrentActionExecutor.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -147,6 +146,7 @@
 				TargetAttributes = {
 					533CC387278F7B1F006CADC2 = {
 						CreatedOnToolsVersion = 13.2.1;
+						LastSwiftMigration = 1320;
 					};
 					533CC38F278F7B1F006CADC2 = {
 						CreatedOnToolsVersion = 13.2.1;
@@ -194,6 +194,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				533CC3A1278F7BDB006CADC2 /* ConcurrentActionExecutor.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -340,6 +341,7 @@
 		533CC39B278F7B1F006CADC2 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
@@ -362,6 +364,7 @@
 				SKIP_INSTALL = YES;
 				SUPPORTED_PLATFORMS = "macosx iphoneos iphonesimulator";
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
@@ -369,6 +372,7 @@
 		533CC39C278F7B1F006CADC2 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
@@ -398,6 +402,7 @@
 		533CC39E278F7B1F006CADC2 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 54PNV7AZ7G;
@@ -414,6 +419,7 @@
 		533CC39F278F7B1F006CADC2 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 54PNV7AZ7G;
