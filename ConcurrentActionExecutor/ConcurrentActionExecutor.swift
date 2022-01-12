@@ -18,9 +18,9 @@ final class ConcurrentActionExecutor {
   }
   
   func execute(completion: @escaping () -> Void) {
-    queue.async { [action] in
+    Task(priority: .high) {
       action()
-      completion()
+      queue.async { completion() }
     }
   }
 }
