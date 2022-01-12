@@ -13,4 +13,8 @@ final class ConcurrentActionExecutor {
   init(outputQueue: DispatchQueue) {
     self.queue = outputQueue
   }
+  
+  func execute(completion: @escaping () -> Void) {
+    queue.async { completion() }
+  }
 }
