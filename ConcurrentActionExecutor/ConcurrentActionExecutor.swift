@@ -7,8 +7,8 @@
 
 import Foundation
 
-final class ConcurrentActionExecutor {
-  typealias Action = () -> Void
+final class ConcurrentActionExecutor<Input, Output> {
+  typealias Action = (Input) -> Output
   let queue: DispatchQueue
   let action: Action
   
@@ -17,10 +17,10 @@ final class ConcurrentActionExecutor {
     self.action = action
   }
   
-  func execute(completion: @escaping () -> Void) {
+  func execute(_ input: Input, completion: @escaping (Output) -> Void) {
     Task(priority: .high) {
-      action()
-      queue.async { completion() }
+      let output = action(input)
+      queue.async { completion(output) }
     }
   }
 }

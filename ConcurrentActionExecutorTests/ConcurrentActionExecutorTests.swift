@@ -23,7 +23,7 @@ class ConcurrentActionExecutorTests: XCTestCase {
     let exp = expectation(description: "Waiting for execution to complete on \(targetQueue)")
     
     startingQueue.async {
-      sut.execute {
+      sut.execute(Void()) {
         if Self.isOnMainQueue {
           exp.fulfill()
         } else {
@@ -37,15 +37,15 @@ class ConcurrentActionExecutorTests: XCTestCase {
   func test_execute_invokes_action_off_mainQueue() {
     let exp = expectation(description: "Waiting for action to be executed off main queue")
     let sut = makeSUT(action: action(for: exp))
-    sut.execute { }
+    sut.execute(Void()) { }
     wait(for: [exp], timeout: 0.1)
   }
 }
 
 // MARK: - Private
 private extension ConcurrentActionExecutorTests {
-  func makeSUT(queue: DispatchQueue = .main, action: @escaping ConcurrentActionExecutor.Action = { }) -> ConcurrentActionExecutor {
-    let sut = ConcurrentActionExecutor(outputQueue: queue, action: action)
+  func makeSUT(queue: DispatchQueue = .main, action: @escaping () -> Void = { }) -> ConcurrentActionExecutor<Void, Void> {
+    let sut = ConcurrentActionExecutor<Void, Void>(outputQueue: queue, action: action)
     return sut
   }
   
