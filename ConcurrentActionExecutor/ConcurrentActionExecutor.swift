@@ -9,6 +9,7 @@ import Foundation
 
 final class ConcurrentActionExecutor<Input, Output> {
   typealias Action = (Input) -> Output
+  typealias ActionOutputCompletion = (Output) -> Void
   
   let action: Action
   let priority: TaskPriority
@@ -18,28 +19,36 @@ final class ConcurrentActionExecutor<Input, Output> {
     self.priority = priority
   }
   
-  func execute(_ input: Input, completion: @escaping (Output) -> Void) {
+  func execute(_ input: Input, completion: @escaping ActionOutputCompletion) {
     runTask(input, completion)
   }
   
-  func execute(completion: @escaping (Output) -> Void) where Input == Void {
+  func execute(completion: @escaping ActionOutputCompletion) where Input == Void {
     runTask((), completion)
   }
   
-  func execute(completion: @escaping () -> Void) where Input == Void, Output == Void {
-    runTask((), completion)
+  func executeAndDeliverOnMain(_ input: Input, completion: @MainActor @escaping (Output) -> Void) {
+    runTaskAndDeliverOnMain(input, completion)
   }
   
-  func execute(_ input: Input, completion: @escaping () -> Void) where Output == Void {
-    runTask(input, completion)
+  func executeAndDeliverOnMain(completion: @MainActor @escaping (Output) -> Void) where Input == Void {
+    runTaskAndDeliverOnMain((), completion)
   }
-  
-  private func runTask(_ input: Input, _ completion: @escaping (Output) -> Void) {
+}
+
+// MARK: - Private
+private extension ConcurrentActionExecutor {
+  func runTask(_ input: Input, _ completion: @escaping (Output) -> Void) {
     Task(priority: priority) {
       let output = action(input)
-      await MainActor.run {
-        completion(output)
-      }
+      completion(output)
+    }
+  }
+  
+  func runTaskAndDeliverOnMain(_ input: Input, _ completion: @MainActor @escaping (Output) -> Void) {
+    Task(priority: priority) {
+      let output = action(input)
+      await completion(output)
     }
   }
 }

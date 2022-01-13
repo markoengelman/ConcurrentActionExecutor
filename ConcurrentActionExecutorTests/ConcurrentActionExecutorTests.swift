@@ -9,22 +9,17 @@ import XCTest
 @testable import ConcurrentActionExecutor
 
 class ConcurrentActionExecutorTests: XCTestCase {
-  func test_execute_completesMainQueue() {
-    let startingQueue = DispatchQueue.global(qos: .background)
-    let targetQueue = DispatchQueue.main
+  func test_execute_completesOnMainQueue() {
     let sut = makeSUT()
-    
-    let exp = expectation(description: "Waiting for execution to complete on \(targetQueue)")
-    
-    startingQueue.async {
-      sut.execute(Void()) {
-        if Self.isOnMainQueue {
-          exp.fulfill()
-        } else {
-          XCTFail("Failed to complete on \(targetQueue)")
-        }
+    let exp = expectation(description: "Waiting for execution to complete on Main Queue")
+    sut.executeAndDeliverOnMain {
+      if Self.isOnMainQueue {
+        exp.fulfill()
+      } else {
+        XCTFail("Failed to complete on Main Queue")
       }
     }
+  
     wait(for: [exp], timeout: 0.1)
   }
   
@@ -38,7 +33,7 @@ class ConcurrentActionExecutorTests: XCTestCase {
   func test_execute_hasNoSideEffects_onInjectedActionResult() {
     let expectedResult = Self.anyResult
     let anyAction = AnyActionMock(result: expectedResult)
-    let sut = AnyConcurrectActionExecutor(action: anyAction.run)
+    let sut = AnyConcurrentActionExecutor(action: anyAction.run)
     let exp = expectation(description: "Waiting for reusult")
     
     var receivedResult: AnyActionResult?
@@ -91,7 +86,7 @@ private extension ConcurrentActionExecutorTests {
 
 private typealias AnyActionRequest = Int
 private typealias AnyActionResult = Int
-private typealias AnyConcurrectActionExecutor = ConcurrentActionExecutor<AnyActionRequest, AnyActionResult>
+private typealias AnyConcurrentActionExecutor = ConcurrentActionExecutor<AnyActionRequest, AnyActionResult>
 
 private protocol AnyAction {
   func run(request: AnyActionRequest) -> AnyActionResult
