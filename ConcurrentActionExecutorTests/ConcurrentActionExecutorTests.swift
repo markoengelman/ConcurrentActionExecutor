@@ -40,6 +40,22 @@ class ConcurrentActionExecutorTests: XCTestCase {
     sut.execute(Void()) { }
     wait(for: [exp], timeout: 0.1)
   }
+  
+  func test_execute_hasNoSideEffects_onInjectedActionResult() {
+    let expectedResult = Self.anyResult
+    let anyAction = AnyActionMock(result: expectedResult)
+    let sut = AnyConcurrectActionExecutor(outputQueue: .main, action: anyAction.run)
+    let exp = expectation(description: "Waiting for reusult")
+    
+    var receivedResult: AnyActionResult?
+    sut.execute(Self.anyRequest) { result in
+      receivedResult = result
+      exp.fulfill()
+    }
+    
+    wait(for: [exp], timeout: 0.1)
+    XCTAssertEqual(receivedResult, expectedResult)
+  }
 }
 
 // MARK: - Private
@@ -61,5 +77,28 @@ private extension ConcurrentActionExecutorTests {
         XCTFail("Failed to execute action off main queue")
       }
     }
+  }
+  
+  static let anyResult = 10
+  static let anyRequest = 1
+}
+
+private typealias AnyActionRequest = Int
+private typealias AnyActionResult = Int
+private typealias AnyConcurrectActionExecutor = ConcurrentActionExecutor<AnyActionRequest, AnyActionResult>
+
+private protocol AnyAction {
+  func run(request: AnyActionRequest) -> AnyActionResult
+}
+
+private class AnyActionMock: AnyAction {
+  let result: AnyActionResult
+  
+  init(result: AnyActionResult) {
+    self.result = result
+  }
+  
+  func run(request: AnyActionRequest) -> AnyActionResult {
+    return result
   }
 }
