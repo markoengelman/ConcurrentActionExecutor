@@ -56,6 +56,18 @@ class ConcurrentActionExecutorTests: XCTestCase {
     wait(for: [exp], timeout: 0.1)
     XCTAssertEqual(receivedResult, expectedResult)
   }
+  
+  func test_allExecutes_deliversResult() {
+    let exp = expectation(description: "Waiting for all expectations to complete")
+    exp.expectedFulfillmentCount = 4
+    
+    ConcurrentActionExecutor<Void, Void>(outputQueue: .main, action: { }).execute { exp.fulfill() }
+    ConcurrentActionExecutor<Void, AnyActionResult>(outputQueue: .main, action: { Self.anyResult }).execute { _ in exp.fulfill() }
+    ConcurrentActionExecutor<AnyActionRequest, Void>(outputQueue: .main, action: { _ in }).execute(Self.anyRequest, completion: { exp.fulfill() })
+    ConcurrentActionExecutor<AnyActionRequest, AnyActionResult>(outputQueue: .main, action: { _ in Self.anyResult }).execute(Self.anyRequest, completion: { _ in exp.fulfill() })
+    
+    wait(for: [exp], timeout: 0.1)
+  }
 }
 
 // MARK: - Private

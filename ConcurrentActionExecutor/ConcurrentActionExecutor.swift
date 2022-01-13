@@ -18,9 +18,27 @@ final class ConcurrentActionExecutor<Input, Output> {
   }
   
   func execute(_ input: Input, completion: @escaping (Output) -> Void) {
+    runTask(input, completion)
+  }
+  
+  func execute(completion: @escaping (Output) -> Void) where Input == Void {
+    runTask((), completion)
+  }
+  
+  func execute(completion: @escaping () -> Void) where Input == Void, Output == Void {
+    runTask((), completion)
+  }
+  
+  func execute(_ input: Input, completion: @escaping () -> Void) where Output == Void {
+    runTask(input, completion)
+  }
+  
+  private func runTask(_ input: Input, _ completion: @escaping (Output) -> Void) {
     Task(priority: .high) {
       let output = action(input)
-      queue.async { completion(output) }
+      queue.async {
+        completion(output)
+      }
     }
   }
 }
