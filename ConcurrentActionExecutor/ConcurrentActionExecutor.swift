@@ -10,12 +10,10 @@ import Foundation
 final class ConcurrentActionExecutor<Input, Output> {
   typealias Action = (Input) -> Output
   
-  let queue: DispatchQueue
   let action: Action
   let priority: TaskPriority
   
-  init(outputQueue: DispatchQueue, priority: TaskPriority = .high, action: @escaping Action) {
-    self.queue = outputQueue
+  init(priority: TaskPriority = .high, action: @escaping Action) {
     self.action = action
     self.priority = priority
   }
@@ -39,7 +37,7 @@ final class ConcurrentActionExecutor<Input, Output> {
   private func runTask(_ input: Input, _ completion: @escaping (Output) -> Void) {
     Task(priority: priority) {
       let output = action(input)
-      queue.async {
+      await MainActor.run {
         completion(output)
       }
     }

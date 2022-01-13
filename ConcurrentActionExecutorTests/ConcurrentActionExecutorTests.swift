@@ -9,26 +9,10 @@ import XCTest
 @testable import ConcurrentActionExecutor
 
 class ConcurrentActionExecutorTests: XCTestCase {
-  func test_init_storesCorrectQueue() {
-    let queue = DispatchQueue.main
-    let sut = makeSUT(queue: queue)
-    XCTAssertEqual(sut.queue, queue)
-  }
-  
-  func test_execute_executesTaskWithInjectedPriority() {
-    let priority = TaskPriority.low
-    var actionPriority: TaskPriority?
-    let sut = makeSUT(priority: priority, action: { actionPriority = Task.currentPriority })
-    let exp = expectation(description: "Waiting for execution to complete")
-    sut.execute { exp.fulfill() }
-    XCTAssertEqual(actionPriority, priority)
-    wait(for: [exp], timeout: 0.1)
-  }
-  
-  func test_execute_completesOnTargetQueue() {
+  func test_execute_completesMainQueue() {
     let startingQueue = DispatchQueue.global(qos: .background)
     let targetQueue = DispatchQueue.main
-    let sut = makeSUT(queue: targetQueue)
+    let sut = makeSUT()
     
     let exp = expectation(description: "Waiting for execution to complete on \(targetQueue)")
     
@@ -54,7 +38,7 @@ class ConcurrentActionExecutorTests: XCTestCase {
   func test_execute_hasNoSideEffects_onInjectedActionResult() {
     let expectedResult = Self.anyResult
     let anyAction = AnyActionMock(result: expectedResult)
-    let sut = AnyConcurrectActionExecutor(outputQueue: .main, action: anyAction.run)
+    let sut = AnyConcurrectActionExecutor(action: anyAction.run)
     let exp = expectation(description: "Waiting for reusult")
     
     var receivedResult: AnyActionResult?
@@ -71,10 +55,10 @@ class ConcurrentActionExecutorTests: XCTestCase {
     let exp = expectation(description: "Waiting for all expectations to complete")
     exp.expectedFulfillmentCount = 4
     
-    ConcurrentActionExecutor<Void, Void>(outputQueue: .main, action: { }).execute { exp.fulfill() }
-    ConcurrentActionExecutor<Void, AnyActionResult>(outputQueue: .main, action: { Self.anyResult }).execute { _ in exp.fulfill() }
-    ConcurrentActionExecutor<AnyActionRequest, Void>(outputQueue: .main, action: { _ in }).execute(Self.anyRequest, completion: { exp.fulfill() })
-    ConcurrentActionExecutor<AnyActionRequest, AnyActionResult>(outputQueue: .main, action: { _ in Self.anyResult }).execute(Self.anyRequest, completion: { _ in exp.fulfill() })
+    ConcurrentActionExecutor<Void, Void>(action: { }).execute { exp.fulfill() }
+    ConcurrentActionExecutor<Void, AnyActionResult>(action: { Self.anyResult }).execute { _ in exp.fulfill() }
+    ConcurrentActionExecutor<AnyActionRequest, Void>(action: { _ in }).execute(Self.anyRequest, completion: { exp.fulfill() })
+    ConcurrentActionExecutor<AnyActionRequest, AnyActionResult>(action: { _ in Self.anyResult }).execute(Self.anyRequest, completion: { _ in exp.fulfill() })
     
     wait(for: [exp], timeout: 0.1)
   }
@@ -82,8 +66,8 @@ class ConcurrentActionExecutorTests: XCTestCase {
 
 // MARK: - Private
 private extension ConcurrentActionExecutorTests {
-  func makeSUT(queue: DispatchQueue = .main, priority: TaskPriority = .high, action: @escaping () -> Void = { }) -> ConcurrentActionExecutor<Void, Void> {
-    let sut = ConcurrentActionExecutor<Void, Void>(outputQueue: queue, priority: priority, action: action)
+  func makeSUT(priority: TaskPriority = .high, action: @escaping () -> Void = { }) -> ConcurrentActionExecutor<Void, Void> {
+    let sut = ConcurrentActionExecutor<Void, Void>(priority: priority, action: action)
     return sut
   }
   
