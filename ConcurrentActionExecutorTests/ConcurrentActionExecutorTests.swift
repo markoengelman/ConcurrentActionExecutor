@@ -15,6 +15,16 @@ class ConcurrentActionExecutorTests: XCTestCase {
     XCTAssertEqual(sut.queue, queue)
   }
   
+  func test_execute_executesTaskWithInjectedPriority() {
+    let priority = TaskPriority.low
+    var actionPriority: TaskPriority?
+    let sut = makeSUT(priority: priority, action: { actionPriority = Task.currentPriority })
+    let exp = expectation(description: "Waiting for execution to complete")
+    sut.execute { exp.fulfill() }
+    XCTAssertEqual(actionPriority, priority)
+    wait(for: [exp], timeout: 0.1)
+  }
+  
   func test_execute_completesOnTargetQueue() {
     let startingQueue = DispatchQueue.global(qos: .background)
     let targetQueue = DispatchQueue.main
@@ -72,8 +82,8 @@ class ConcurrentActionExecutorTests: XCTestCase {
 
 // MARK: - Private
 private extension ConcurrentActionExecutorTests {
-  func makeSUT(queue: DispatchQueue = .main, action: @escaping () -> Void = { }) -> ConcurrentActionExecutor<Void, Void> {
-    let sut = ConcurrentActionExecutor<Void, Void>(outputQueue: queue, action: action)
+  func makeSUT(queue: DispatchQueue = .main, priority: TaskPriority = .high, action: @escaping () -> Void = { }) -> ConcurrentActionExecutor<Void, Void> {
+    let sut = ConcurrentActionExecutor<Void, Void>(outputQueue: queue, priority: priority, action: action)
     return sut
   }
   
