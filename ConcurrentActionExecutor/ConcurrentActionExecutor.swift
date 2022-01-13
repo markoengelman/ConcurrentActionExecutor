@@ -34,6 +34,24 @@ final class ConcurrentActionExecutor<Input, Output> {
   func executeAndDeliverOnMain(completion: @MainActor @escaping (Output) -> Void) where Input == Void {
     runTaskAndDeliverOnMain((), completion)
   }
+  
+  func execute(_ input: Input) async -> Output {
+    await runTask(input)
+  }
+  
+  func execute() async -> Output where Input == Void {
+    await runTask(())
+  }
+  
+  @MainActor
+  func executeAndDeliverOnMain(_ input: Input) async -> Output {
+    await runTask(input)
+  }
+  
+  @MainActor
+  func executeAndDeliverOnMain() async -> Output where Input == Void {
+    await runTask(())
+  }
 }
 
 // MARK: - Private
@@ -50,5 +68,9 @@ private extension ConcurrentActionExecutor {
       let output = action(input)
       await completion(output)
     }
+  }
+  
+  func runTask(_ input: Input) async -> Output {
+    await Task(priority: priority, operation: { action(input) }).value
   }
 }
